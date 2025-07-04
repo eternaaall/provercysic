@@ -2,7 +2,6 @@
 
 CONFIG_FILE="$HOME/.cysic_prover_config"
 
-logo() {
 clear
 echo
 echo "╔══════════════════════════════════════╗"
