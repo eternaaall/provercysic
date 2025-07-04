@@ -1,0 +1,184 @@
+#!/bin/bash
+
+CONFIG_FILE="$HOME/.cysic_prover_config"
+
+logo() {
+clear
+echo
+echo "ã======================================¬"
+echo "¦     ?? Cysic Simple Prover           ¦"
+echo "¦     created by eternaaall           ¦"
+echo "L======================================-"
+echo
+}
+
+save_config() {
+  echo "WALLET=$WALLET" > "$CONFIG_FILE"
+  echo "RPC=$RPC" >> "$CONFIG_FILE"
+  echo "MODE=$MODE" >> "$CONFIG_FILE"
+}
+
+load_config() {
+  source "$CONFIG_FILE" 2>/dev/null
+}
+
+reset_keys() {
+  echo "Removing prover keys..."
+  rm -rf /root/cysic-prover/data/
+  rm -rf /root/cysic-prover/~/
+}
+
+close_all_screens() {
+  echo "Closing all screen sessions..."
+  screen -ls | grep Detached | cut -d. -f1 | awk '{print $1}' | xargs -r kill
+}
+
+select_mode() {
+  echo
+  echo "Choose installation mode:"
+  echo "1) Only Eth (Preferred)"
+  echo "2) Only Scroll (No Tasks)"
+  echo "3) Eth + Scroll"
+  read -p "Enter your choice [1-3]: " MODE
+  case $MODE in
+    1) SCRIPT_NAME="setup_prover_only_ethProof.sh"; SCREEN_NAME="OnlyEth" ;;
+    2) SCRIPT_NAME="setup_prover_only_scroll.sh"; SCREEN_NAME="OnlyScroll" ;;
+    3) SCRIPT_NAME="setup_prover.sh"; SCREEN_NAME="EthScroll" ;;
+    *) echo "Invalid option."; exit 1 ;;
+  esac
+}
+
+run_installer() {
+  logo
+  echo "Installing dependencies..."
+  sudo apt update && sudo apt upgrade -y
+  sudo apt install -y screen curl pciutils lshw
+
+  reset_keys
+
+  SCRIPT_FILE="$HOME/$SCRIPT_NAME"
+  INSTALL_CMD="curl -L https://github.com/cysic-labs/cysic-phase3/releases/download/v1.0.0/$SCRIPT_NAME > $SCRIPT_FILE && \
+bash $SCRIPT_FILE $WALLET $RPC"
+
+  if [[ "$MODE" == "2" ]]; then
+    INSTALL_CMD="curl -L https://github.com/cysic-labs/cysic-phase3/releases/download/v1.0.0/$SCRIPT_NAME > $SCRIPT_FILE && \
+bash $SCRIPT_FILE $WALLET"
+  fi
+
+  echo -e "\e[93m"
+  echo "ã==============================================================================¬"
+  echo "¦ During installation, you will be asked:                                     ¦"
+  echo "¦ do you want to setup the software env for eth proof (y/n)?                 ¦"
+  echo "¦ This will install: sp1, CUDA driver and Docker                             ¦"
+  echo "¦ Answer 'n' if you're using a rented container (e.g. Vast).                 ¦"
+  echo "L==============================================================================-"
+  echo -e "\e[0m"
+  sleep 2
+
+  echo
+  echo "Running installation..."
+  eval "$INSTALL_CMD"
+
+  echo
+  echo "Launching Prover inside screen session [$SCREEN_NAME]..."
+  screen -dmS "$SCREEN_NAME" bash -c '
+cd ~/cysic-prover
+while true; do
+  bash start.sh
+  sleep 5
+done'
+  screen -r "$SCREEN_NAME"
+}
+
+launch_prover() {
+  echo
+  echo "??  Requirements:"
+  echo "• At least 16 GB free VRAM"
+  echo "• At least 16+ GB RAM"
+  echo "• High-performance CPU"
+  echo
+  read -p "Do you want to proceed with launching the prover? (y/n): " CONFIRM
+  [[ "$CONFIRM" != "y" ]] && exit 0
+  echo
+  reset_keys
+  screen -dmS "$SCREEN_NAME" bash -c '
+cd ~/cysic-prover
+while true; do
+  bash start.sh
+  sleep 5
+done'
+  screen -r "$SCREEN_NAME"
+}
+
+main_menu() {
+  logo
+  echo "1) Attach to screen session [$SCREEN_NAME]"
+  echo "2) Update script and mode"
+  echo "3) Reset key and kill all Prover sessions"
+  echo "4) Launch new Prover"
+  echo "5) Exit"
+  echo
+  read -p "Choose an option [1-5]: " CHOICE
+  case $CHOICE in
+    1) screen -r "$SCREEN_NAME" ;;
+    2) 
+      echo
+      echo -e "\e[91m"
+      echo "ã============================================================¬"
+      echo "¦                        ??  WARNING                         ¦"
+      echo "¦                                                            ¦"
+      echo "¦  Your key will be deleted and the Prover will be reinstalled.  ¦"
+      echo "¦                                                            ¦"
+      echo "L============================================================-"
+      echo -e "\e[0m"
+      sleep 2
+      read -p "Continue? (y/n): " CONFIRM
+      [[ "$CONFIRM" != "y" ]] && exit 0
+      select_mode
+      save_config
+      close_all_screens
+      reset_keys
+      rm -rf /root/cysic-prover/
+      rm -f "$HOME/$SCRIPT_NAME"
+      run_installer
+      ;;
+    3)
+      close_all_screens
+      reset_keys
+      echo "Done."
+      ;;
+    4)
+      launch_prover
+      ;;
+    5) exit 0 ;;
+    *) echo "Invalid option." ;;
+  esac
+}
+
+### Main
+logo
+
+if [[ -f "$CONFIG_FILE" ]]; then
+  load_config
+  case "$MODE" in
+    1) SCRIPT_NAME="setup_prover_only_ethProof.sh"; SCREEN_NAME="OnlyEth" ;;
+    2) SCRIPT_NAME="setup_prover_only_scroll.sh"; SCREEN_NAME="OnlyScroll" ;;
+    3) SCRIPT_NAME="setup_prover.sh"; SCREEN_NAME="EthScroll" ;;
+  esac
+  main_menu
+else
+  while true; do
+    read -p "Enter your wallet address (0x...): " WALLET
+    if [[ $WALLET =~ ^0x[a-fA-F0-9]{40}$ ]]; then
+      break
+    fi
+    echo "Invalid wallet address. Try again."
+  done
+
+  read -p "Enter your RPC URL (required for Eth): " RPC
+
+  select_mode
+
+  save_config
+  run_installer
+fi
