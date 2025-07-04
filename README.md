@@ -20,7 +20,7 @@ Created by **@eternaaall** 🧠
 ## 📦 Quick Start (1 Command Install)
 
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/eternaaall/provercys_byetrnl/main/provercys_byetrnl)
+bash <(curl -s https://raw.githubusercontent.com/eternaaall/provercysic/main/provercys_byetrnl)
 ```
 
 You will be prompted to enter your EVM wallet and RPC URL (for Eth).
