@@ -2,6 +2,7 @@
 
 CONFIG_FILE="$HOME/.cysic_prover_config"
 
+logo() {
 clear
 echo
 echo "╔══════════════════════════════════════╗"
@@ -80,12 +81,7 @@ bash $SCRIPT_FILE $WALLET"
 
   echo
   echo "Launching Prover inside screen session [$SCREEN_NAME]..."
-  screen -dmS "$SCREEN_NAME" bash -c '
-cd ~/cysic-prover
-while true; do
-  bash start.sh
-  sleep 5
-done'
+  screen -dmS "$SCREEN_NAME" bash -c "cd ~/cysic-prover && while true; do bash start.sh; sleep 5; done"
   screen -r "$SCREEN_NAME"
 }
 
@@ -100,12 +96,7 @@ launch_prover() {
   [[ "$CONFIRM" != "y" ]] && exit 0
   echo
   reset_keys
-  screen -dmS "$SCREEN_NAME" bash -c '
-cd ~/cysic-prover
-while true; do
-  bash start.sh
-  sleep 5
-done'
+  screen -dmS "$SCREEN_NAME" bash -c "cd ~/cysic-prover && while true; do bash start.sh; sleep 5; done"
   screen -r "$SCREEN_NAME"
 }
 
@@ -123,12 +114,13 @@ main_menu() {
     2) 
       echo
       echo -e "\e[91m"
-      echo "╔════════════════════════════════════════════════════════════╗"
-      echo "║                        ⚠️  WARNING                         ║"
-      echo "║                                                            ║"
-      echo "║  Your key will be deleted and the Prover will be reinstalled.  ║"
-      echo "║                                                            ║"
-      echo "╚════════════════════════════════════════════════════════════╝"
+      echo "╔═════════════════════════════════════════════════════╗"
+      echo "║                     ⚠ WARNING ⚠                    ║"
+      echo "║                                                     ║"
+      echo "║     Your key will be deleted                        ║"
+      echo "║     and Prover will be reinstalled.                 ║"
+      echo "║                                                     ║"
+      echo "╚═════════════════════════════════════════════════════╝"
       echo -e "\e[0m"
       sleep 2
       read -p "Continue? (y/n): " CONFIRM
@@ -177,7 +169,6 @@ else
   read -p "Enter your RPC URL (required for Eth): " RPC
 
   select_mode
-
   save_config
   run_installer
 fi
