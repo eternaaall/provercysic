@@ -5,10 +5,10 @@ CONFIG_FILE="$HOME/.cysic_prover_config"
 logo() {
 clear
 echo
-echo "�======================================�"
-echo "�     ?? Cysic Simple Prover           �"
-echo "�     created by eternaaall           �"
-echo "L======================================-"
+echo "╔══════════════════════════════════════╗"
+echo "║     💻 Cysic Simple Prover           ║"
+echo "║     created by eternaaall           ║"
+echo "╚══════════════════════════════════════╝"
 echo
 }
 
@@ -66,12 +66,12 @@ bash $SCRIPT_FILE $WALLET"
   fi
 
   echo -e "\e[93m"
-  echo "�==============================================================================�"
-  echo "� During installation, you will be asked:                                     �"
-  echo "� do you want to setup the software env for eth proof (y/n)?                 �"
-  echo "� This will install: sp1, CUDA driver and Docker                             �"
-  echo "� Answer 'n' if you're using a rented container (e.g. Vast).                 �"
-  echo "L==============================================================================-"
+  echo "╔══════════════════════════════════════════════════════════════════════════════╗"
+  echo "║ During installation, you will be asked:                                     ║"
+  echo "║ do you want to setup the software env for eth proof (y/n)?                 ║"
+  echo "║ This will install: sp1, CUDA driver and Docker                             ║"
+  echo "║ Answer 'n' if you're using a rented container (e.g. Vast).                 ║"
+  echo "╚══════════════════════════════════════════════════════════════════════════════╝"
   echo -e "\e[0m"
   sleep 2
 
@@ -92,10 +92,10 @@ done'
 
 launch_prover() {
   echo
-  echo "??  Requirements:"
-  echo "� At least 16 GB free VRAM"
-  echo "� At least 16+ GB RAM"
-  echo "� High-performance CPU"
+  echo "⚠️  Requirements:"
+  echo "• At least 16 GB free VRAM"
+  echo "• At least 16+ GB RAM"
+  echo "• High-performance CPU"
   echo
   read -p "Do you want to proceed with launching the prover? (y/n): " CONFIRM
   [[ "$CONFIRM" != "y" ]] && exit 0
@@ -124,12 +124,12 @@ main_menu() {
     2) 
       echo
       echo -e "\e[91m"
-      echo "�============================================================�"
-      echo "�                        ??  WARNING                         �"
-      echo "�                                                            �"
-      echo "�  Your key will be deleted and the Prover will be reinstalled.  �"
-      echo "�                                                            �"
-      echo "L============================================================-"
+      echo "╔════════════════════════════════════════════════════════════╗"
+      echo "║                        ⚠️  WARNING                         ║"
+      echo "║                                                            ║"
+      echo "║  Your key will be deleted and the Prover will be reinstalled.  ║"
+      echo "║                                                            ║"
+      echo "╚════════════════════════════════════════════════════════════╝"
       echo -e "\e[0m"
       sleep 2
       read -p "Continue? (y/n): " CONFIRM
