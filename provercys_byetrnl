@@ -1,9 +1,4 @@
-from pathlib import Path
-
-# Створимо фінальний скрипт як текстовий файл для завантаження
-script_path = Path("/mnt/data/cysic_prover_final.sh")
-
-script_content = '''#!/bin/bash
+#!/bin/bash
 
 CONFIG_FILE="$HOME/.cysic_prover_config"
 FIRST_RUN=false
