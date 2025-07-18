@@ -109,7 +109,7 @@ bash $SCRIPT_FILE $WALLET"
 
   echo
   echo "Launching Prover inside screen session [$SCREEN_NAME]..."
-  screen -dmS "$SCREEN_NAME" bash -c "cd ~/cysic-prover && while true; do bash start.sh >> \"$LOG_FILE\" 2>&1; sleep 5; done"
+  screen -dmS "$SCREEN_NAME" bash -c "cd ~/cysic-prover && while true; do bash start.sh 2>&1 | tee -a \"$LOG_FILE\"; sleep 5; done"
   sleep 3
   parse_prover_id
   screen -r "$SCREEN_NAME"
@@ -127,7 +127,7 @@ launch_prover() {
   [[ "$CONFIRM" != "y" ]] && exit 0
   echo
   reset_keys
-  screen -dmS "$SCREEN_NAME" bash -c "cd ~/cysic-prover && while true; do bash start.sh >> \"$LOG_FILE\" 2>&1; sleep 5; done"
+  screen -dmS "$SCREEN_NAME" bash -c "cd ~/cysic-prover && while true; do bash start.sh 2>&1 | tee -a \"$LOG_FILE\"; sleep 5; done"
   sleep 3
   parse_prover_id
   screen -r "$SCREEN_NAME"
