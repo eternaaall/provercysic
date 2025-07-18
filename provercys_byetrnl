@@ -45,6 +45,110 @@ reset_keys() {
   fi
 }
 
-# Остальная логика остаётся без изменений,
-# но после установки в run_installer можно добавить определение PROVER_ID по логу и сохранить его:
-# Например, с помощью grep & cut, если лог доступен после запуска
+  echo -e "\e[93m"
+  echo "╔══════════════════════════════════════════════════════════════════════════════╗"
+  echo "║ During installation, you will be asked:                                     ║"
+  echo "║ do you want to setup the software env for eth proof (y/n)?                 ║"
+  echo "║ This will install: sp1, CUDA driver and Docker                             ║"
+  echo "║ Answer 'n' if you're using a rented container (e.g. Vast).                 ║"
+  echo "╚══════════════════════════════════════════════════════════════════════════════╝"
+  echo -e "\e[0m"
+  sleep 2
+
+  echo
+  echo "Running installation..."
+  eval "$INSTALL_CMD"
+
+  echo
+  echo "Launching Prover inside screen session [$SCREEN_NAME]..."
+  screen -dmS "$SCREEN_NAME" bash -c "cd ~/cysic-prover && while true; do bash start.sh; sleep 5; done"
+  screen -r "$SCREEN_NAME"
+}
+
+launch_prover() {
+  echo
+  echo "⚠️  Requirements:"
+  echo "• At least 16 GB free VRAM"
+  echo "• At least 16+ GB RAM"
+  echo "• High-performance CPU"
+  echo
+  read -p "Do you want to proceed with launching the prover? (y/n): " CONFIRM
+  [[ "$CONFIRM" != "y" ]] && exit 0
+  echo
+  reset_keys
+  screen -dmS "$SCREEN_NAME" bash -c "cd ~/cysic-prover && while true; do bash start.sh; sleep 5; done"
+  screen -r "$SCREEN_NAME"
+}
+
+main_menu() {
+  logo
+  echo "1) Attach to screen session [$SCREEN_NAME]"
+  echo "2) Update script and mode"
+  echo "3) Reset key and kill all Prover sessions"
+  echo "4) Launch new Prover"
+  echo "5) Exit"
+  echo
+  read -p "Choose an option [1-5]: " CHOICE
+  case $CHOICE in
+    1) screen -r "$SCREEN_NAME" ;;
+    2) 
+      echo
+      echo -e "\e[91m"
+      echo "╔═════════════════════════════════════════════════════╗"
+      echo "║                     ⚠ WARNING ⚠                    ║"
+      echo "║                                                     ║"
+      echo "║     Your key will be deleted                        ║"
+      echo "║     and Prover will be reinstalled.                 ║"
+      echo "║                                                     ║"
+      echo "╚═════════════════════════════════════════════════════╝"
+      echo -e "\e[0m"
+      sleep 2
+      read -p "Continue? (y/n): " CONFIRM
+      [[ "$CONFIRM" != "y" ]] && exit 0
+      select_mode
+      save_config
+      close_all_screens
+      reset_keys
+      rm -rf /root/cysic-prover/
+      rm -f "$HOME/$SCRIPT_NAME"
+      run_installer
+      ;;
+    3)
+      close_all_screens
+      reset_keys
+      echo "Done."
+      ;;
+    4)
+      launch_prover
+      ;;
+    5) exit 0 ;;
+    *) echo "Invalid option." ;;
+  esac
+}
+
+### Main
+logo
+
+if [[ -f "$CONFIG_FILE" ]]; then
+  load_config
+  case "$MODE" in
+    1) SCRIPT_NAME="setup_prover_only_ethProof.sh"; SCREEN_NAME="OnlyEth" ;;
+    2) SCRIPT_NAME="setup_prover_only_scroll.sh"; SCREEN_NAME="OnlyScroll" ;;
+    3) SCRIPT_NAME="setup_prover.sh"; SCREEN_NAME="EthScroll" ;;
+  esac
+  main_menu
+else
+  while true; do
+    read -p "Enter your wallet address (0x...): " WALLET
+    if [[ $WALLET =~ ^0x[a-fA-F0-9]{40}$ ]]; then
+      break
+    fi
+    echo "Invalid wallet address. Try again."
+  done
+
+  read -p "Enter your RPC URL (required for Eth): " RPC
+
+  select_mode
+  save_config
+  run_installer
+fi
