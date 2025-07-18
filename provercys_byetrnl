@@ -62,8 +62,8 @@ select_mode() {
 }
 
 parse_prover_id() {
-  ID_LINE=$(grep -a "prover: 0x" ~/cysic-prover/logs/error.log 2>/dev/null | tail -n 1)
-  RAW_ADDR=$(echo "$ID_LINE" | grep -oP 'prover: \K0x[a-fA-F0-9]{40}' || true)
+  RAW_LINE=$(grep -a "prover: 0x" ~/cysic-prover/logs/error.log 2>/dev/null | tail -n 1)
+  RAW_ADDR=$(echo "$RAW_LINE" | grep -oP 'prover: \K0x[a-fA-F0-9]{40}' || true)
   if [[ -n "$RAW_ADDR" ]]; then
     SUFFIX="${RAW_ADDR: -5}"
     PROVER_ID="0x********$SUFFIX"
@@ -100,14 +100,13 @@ bash $SCRIPT_FILE $WALLET"
 
   echo
   echo "Running installation..."
-  mkdir -p ~/cysic-prover/logs
-  eval "$INSTALL_CMD" 2> ~/cysic-prover/logs/error.log
-
-  parse_prover_id
+  eval "$INSTALL_CMD"
 
   echo
   echo "Launching Prover inside screen session [$SCREEN_NAME]..."
   screen -dmS "$SCREEN_NAME" bash -c "cd ~/cysic-prover && while true; do bash start.sh; sleep 5; done"
+  sleep 2
+  parse_prover_id
   screen -r "$SCREEN_NAME"
 }
 
@@ -123,8 +122,7 @@ launch_prover() {
   [[ "$CONFIRM" != "y" ]] && exit 0
   echo
   reset_keys
-  mkdir -p ~/cysic-prover/logs
-  screen -dmS "$SCREEN_NAME" bash -c "cd ~/cysic-prover && while true; do bash start.sh 2> logs/error.log; sleep 5; done"
+  screen -dmS "$SCREEN_NAME" bash -c "cd ~/cysic-prover && while true; do bash start.sh; sleep 5; done"
   sleep 2
   parse_prover_id
   screen -r "$SCREEN_NAME"
@@ -141,7 +139,7 @@ main_menu() {
   read -p "Choose an option [1-5]: " CHOICE
   case $CHOICE in
     1) screen -r "$SCREEN_NAME" ;;
-    2) 
+    2)
       echo
       echo -e "\e[91m"
       echo "╔═════════════════════════════════════════════════════╗"
