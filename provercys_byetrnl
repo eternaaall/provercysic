@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CONFIG_FILE="$HOME/.cysic_prover_config"
-FIRST_RUN=True
+FIRST_RUN=true
 
 logo() {
   clear
@@ -12,10 +12,7 @@ logo() {
   echo "╚══════════════════════════════════════╝"
   echo
   [[ -n "$WALLET" ]] && echo "🔑 Wallet: $WALLET"
-  if [[ -n "$RPC" ]]; then
-    MASKED_RPC=$(echo "$RPC" | sed -E 's|(.{8}).*(.{6})|\\1********\\2|')
-    echo "🌐 RPC: $MASKED_RPC"
-  fi
+  [[ -n "$RPC" ]] && echo "🌐 RPC: $RPC"
   [[ -n "$PROVER_ID" ]] && echo "🆔 Active Prover ID: $PROVER_ID"
   [[ "$FIRST_RUN" == false ]] && echo "📦 Dependencies already installed."
   echo
@@ -67,14 +64,12 @@ select_mode() {
 }
 
 parse_prover_id() {
-  RAW=$(screen -ls | grep "$SCREEN_NAME" | grep Detached)
-  if [[ -n "$RAW" ]]; then
-    LOG=$(screen -S "$SCREEN_NAME" -X hardcopy ~/.cysic_last.log && grep "prover: 0x" ~/.cysic_last.log | tail -n 1)
-    RAW_ADDR=$(echo "$LOG" | grep -oP 'prover: \K0x[a-fA-F0-9]{40}')
-    if [[ -n "$RAW_ADDR" ]]; then
-      PROVER_ID="0x********${RAW_ADDR: -5}"
-      save_config
-    fi
+  screen -S "$SCREEN_NAME" -X hardcopy ~/.cysic_last.log
+  PROVER_LINE=$(grep "error when get prover from chain" ~/.cysic_last.log | tail -n 1)
+  RAW_ADDR=$(echo "$PROVER_LINE" | grep -oP 'prover: \K0x[a-fA-F0-9]{40}')
+  if [[ -n "$RAW_ADDR" ]]; then
+    PROVER_ID="0x********${RAW_ADDR: -5}"
+    save_config
   fi
 }
 
