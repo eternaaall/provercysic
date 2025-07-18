@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CONFIG_FILE="$HOME/.cysic_prover_config"
-FIRST_RUN=false
+FIRST_RUN=True
 
 logo() {
   clear
