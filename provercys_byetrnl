@@ -35,7 +35,7 @@ parse_prover_id() {
     PROVER_LINE=$(grep "prover: 0x" "$LOG_FILE" | tail -n 1)
     RAW_ADDR=$(echo "$PROVER_LINE" | grep -oP 'prover: \K0x[a-fA-F0-9]{40}')
     if [[ -n "$RAW_ADDR" ]]; then
-      PROVER_ID="0x********${RAW_ADDR: -5}"
+      PROVER_ID="$RAW_ADDR"
       save_config
     fi
   fi
