@@ -1,6 +1,7 @@
 #!/bin/bash
 
 CONFIG_FILE="$HOME/.cysic_prover_config"
+LOG_FILE="$HOME/cysic-prover/log.txt"
 FIRST_RUN=true
 
 logo() {
@@ -29,6 +30,17 @@ load_config() {
   source "$CONFIG_FILE" 2>/dev/null
 }
 
+parse_prover_id() {
+  if [[ -f "$LOG_FILE" ]]; then
+    PROVER_LINE=$(grep "prover: 0x" "$LOG_FILE" | tail -n 1)
+    RAW_ADDR=$(echo "$PROVER_LINE" | grep -oP 'prover: \K0x[a-fA-F0-9]{40}')
+    if [[ -n "$RAW_ADDR" ]]; then
+      PROVER_ID="0x********${RAW_ADDR: -5}"
+      save_config
+    fi
+  fi
+}
+
 reset_keys() {
   if [[ "$FIRST_RUN" == false ]]; then
     read -p "Are you sure you want to delete all prover keys? (y/n): " CONFIRM
@@ -37,6 +49,7 @@ reset_keys() {
   echo "Removing prover keys..."
   rm -rf /root/cysic-prover/data/
   rm -rf /root/cysic-prover/~/
+  rm -f "$LOG_FILE"
   sed -i '/^PROVER_ID=/d' "$CONFIG_FILE" 2>/dev/null
   unset PROVER_ID
 }
@@ -61,16 +74,6 @@ select_mode() {
     3) SCRIPT_NAME="setup_prover.sh"; SCREEN_NAME="EthScroll" ;;
     *) echo "Invalid option."; exit 1 ;;
   esac
-}
-
-parse_prover_id() {
-  screen -S "$SCREEN_NAME" -X hardcopy ~/.cysic_last.log
-  PROVER_LINE=$(grep "error when get prover from chain" ~/.cysic_last.log | tail -n 1)
-  RAW_ADDR=$(echo "$PROVER_LINE" | grep -oP 'prover: \K0x[a-fA-F0-9]{40}')
-  if [[ -n "$RAW_ADDR" ]]; then
-    PROVER_ID="0x********${RAW_ADDR: -5}"
-    save_config
-  fi
 }
 
 run_installer() {
@@ -106,8 +109,8 @@ bash $SCRIPT_FILE $WALLET"
 
   echo
   echo "Launching Prover inside screen session [$SCREEN_NAME]..."
-  screen -dmS "$SCREEN_NAME" bash -c "cd ~/cysic-prover && while true; do bash start.sh; sleep 5; done"
-  sleep 2
+  screen -dmS "$SCREEN_NAME" bash -c "cd ~/cysic-prover && while true; do bash start.sh >> \"$LOG_FILE\" 2>&1; sleep 5; done"
+  sleep 3
   parse_prover_id
   screen -r "$SCREEN_NAME"
 }
@@ -124,8 +127,8 @@ launch_prover() {
   [[ "$CONFIRM" != "y" ]] && exit 0
   echo
   reset_keys
-  screen -dmS "$SCREEN_NAME" bash -c "cd ~/cysic-prover && while true; do bash start.sh; sleep 5; done"
-  sleep 2
+  screen -dmS "$SCREEN_NAME" bash -c "cd ~/cysic-prover && while true; do bash start.sh >> \"$LOG_FILE\" 2>&1; sleep 5; done"
+  sleep 3
   parse_prover_id
   screen -r "$SCREEN_NAME"
 }
