@@ -1,20 +1,21 @@
 #!/bin/bash
 
 CONFIG_FILE="$HOME/.cysic_prover_config"
+FIRST_RUN=false
 
 logo() {
-clear
-echo
-echo "╔══════════════════════════════════════╗"
-echo "║     💻 Cysic Simple Prover           ║"
-echo "║     created by eternaaall           ║"
-echo "╚══════════════════════════════════════╝"
-echo
-[[ -n "$WALLET" ]] && echo "🔑 Wallet: $WALLET"
-[[ -n "$RPC" ]] && echo "🌐 RPC: $(echo "$RPC" | sed -E 's|(https?://[^/]{5})[^/]*([^.]{5})$|\1***\2|')"
-[[ -n "$PROVER_ID" ]] && echo "🆔 Prover ID: $PROVER_ID"
-echo "📦 Dependencies already installed."
-echo
+  clear
+  echo
+  echo "╔══════════════════════════════════════╗"
+  echo "║     💻 Cysic Simple Prover           ║"
+  echo "║     created by eternaaall           ║"
+  echo "╚══════════════════════════════════════╝"
+  echo
+  [[ -n "$WALLET" ]] && echo "🔑 Wallet: $WALLET"
+  [[ -n "$RPC" ]] && echo "🌐 RPC: $(echo "$RPC" | sed -E 's|(https?://[^/]{5})[^/]*([^.]{5})$|\1***\2|')"
+  [[ -n "$PROVER_ID" ]] && echo "🆔 Active Prover ID: $PROVER_ID"
+  [[ "$FIRST_RUN" == false ]] && echo "📦 Dependencies already installed."
+  echo
 }
 
 save_config() {
@@ -29,8 +30,10 @@ load_config() {
 }
 
 reset_keys() {
-  read -p "Are you sure you want to delete all prover keys? (y/n): " CONFIRM
-  [[ "$CONFIRM" != "y" ]] && echo "Cancelled." && return
+  if [[ "$FIRST_RUN" == false ]]; then
+    read -p "Are you sure you want to delete all prover keys? (y/n): " CONFIRM
+    [[ "$CONFIRM" != "y" ]] && echo "Cancelled." && return
+  fi
   echo "Removing prover keys..."
   rm -rf /root/cysic-prover/data/
   rm -rf /root/cysic-prover/~/
@@ -183,8 +186,10 @@ if [[ -f "$CONFIG_FILE" ]]; then
     2) SCRIPT_NAME="setup_prover_only_scroll.sh"; SCREEN_NAME="OnlyScroll" ;;
     3) SCRIPT_NAME="setup_prover.sh"; SCREEN_NAME="EthScroll" ;;
   esac
+  FIRST_RUN=false
   main_menu
 else
+  FIRST_RUN=true
   while true; do
     read -p "Enter your wallet address (0x...): " WALLET
     if [[ $WALLET =~ ^0x[a-fA-F0-9]{40}$ ]]; then
