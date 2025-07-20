@@ -56,7 +56,7 @@ reset_keys() {
 
 delete_key_for_import() {
   echo "Removing key for import..."
-  rm -rf /root/cysic-prover/~/\\.cysic/assets/* 2>/dev/null
+  rm -rf /root/cysic-prover/~/\.cysic/assets/* 2>/dev/null
   sed -i '/^PROVER_ID=/d' "$CONFIG_FILE" 2>/dev/null
   unset PROVER_ID
   echo "Done. Now import your key (/root/cysic-prover/~/.cysic/assets/) and run option 5) to launch and re-import Prover ID."
