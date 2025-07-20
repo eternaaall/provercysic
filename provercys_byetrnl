@@ -43,7 +43,7 @@ parse_prover_id() {
 
 reset_keys() {
   if [[ "$FIRST_RUN" == false ]]; then
-    read -p "Are you sure you want to delete all prover keys? (y/n): " CONFIRM
+    read -p "Are you sure you want to delete the prover key? (y/n): " CONFIRM
     [[ "$CONFIRM" != "y" ]] && echo "Cancelled." && return
   fi
   echo "Removing prover keys..."
@@ -63,7 +63,7 @@ delete_key_for_import() {
 }
 
 close_all_screens() {
-  read -p "Are you sure you want to close all prover sessions? (y/n): " CONFIRM
+  read -p "Are you sure you want to close all active prover sessions? (y/n): " CONFIRM
   [[ "$CONFIRM" != "y" ]] && echo "Cancelled." && return
   echo "Closing all screen sessions..."
   screen -ls | grep Detached | cut -d. -f1 | awk '{print $1}' | xargs -r kill
