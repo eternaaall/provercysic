@@ -177,7 +177,7 @@ main_menu() {
       run_installer
       ;;
     3) close_all_screens; reset_keys; echo "Done." ;;
-    4) delete_key_for_import ;;
+    4) delete_key_for_import; close_all_screens ;;
     5) launch_prover ;;
     6) exit 0 ;;
     *) echo "Invalid option." ;;
