@@ -56,11 +56,10 @@ reset_keys() {
 
 delete_key_for_import() {
   echo "Removing key for import..."
-  rm -rf /root/cysic-prover/~/
-  rm -rf /root/cysic-prover/~/\\.cysic/assets/
+  rm -rf /root/cysic-prover/~/\\.cysic/assets/* 2>/dev/null
   sed -i '/^PROVER_ID=/d' "$CONFIG_FILE" 2>/dev/null
   unset PROVER_ID
-  echo "Done. Now run option 5) to launch and re-import Prover ID."
+  echo "Done. Now import your key (/root/cysic-prover/~/.cysic/assets/) and run option 5) to launch and re-import Prover ID."
 }
 
 close_all_screens() {
@@ -173,7 +172,8 @@ main_menu() {
       close_all_screens
       reset_keys
       rm -rf /root/cysic-prover/
-      rm -f "$HOME/setup_prover.sh" "$HOME/setup_prover_only_scroll.sh" "$HOME/setup_prover_only_ethProof.sh"
+      rm -rf .cysic
+      rm -f "root/setup_prover.sh" "root/setup_prover_only_scroll.sh" "root/setup_prover_only_ethProof.sh"
       run_installer
       ;;
     3) close_all_screens; reset_keys; echo "Done." ;;
