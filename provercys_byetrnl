@@ -174,7 +174,7 @@ main_menu() {
         reset_keys
         rm -rf /root/cysic-prover/
         rm -f "$HOME/$SCRIPT_NAME"
-        rm -f /root/setup_prover*.sh
+        rm -f "/root/setup_prover.sh" "/root/setup_prover_only_scroll.sh" "/root/setup_prover_only_ethProof.sh"
         run_installer
         ;;
       3)
