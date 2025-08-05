@@ -142,51 +142,64 @@ launch_prover() {
 }
 
 main_menu() {
- while true; do
-  logo
-  echo "1) Attach to screen session [$SCREEN_NAME]"
-  echo "2) Update script and mode"
-  echo "3) Reset key and kill all Prover sessions"
-  echo "4) Remove key to import yours"
-  echo "5) Launch new Prover"
-  echo "6) Exit"
-  echo
-  read -p "Choose an option [1-6]: " CHOICE
-  case $CHOICE in
-    1) screen -r "$SCREEN_NAME" ;;
-    2)
-      echo
-      echo -e "\\e[91m"
-      echo "╔═════════════════════════════════════════════════════╗"
-      echo "║                     ⚠ WARNING ⚠                    ║"
-      echo "║                                                     ║"
-      echo "║     Your key will be deleted                        ║"
-      echo "║     and Prover will be reinstalled.                 ║"
-      echo "║                                                     ║"
-      echo "╚═════════════════════════════════════════════════════╝"
-      echo -e "\\e[0m"
-      sleep 2
-      read -p "Continue? (y/n): " CONFIRM
-      [[ "$CONFIRM" != "y" ]] && exit 0
-      select_mode
-      save_config
-      close_all_screens
-      reset_keys
-      rm -rf /root/cysic-prover/
-      rm -rf .cysic
-      rm -f "/root/setup_prover.sh" "/root/setup_prover_only_scroll.sh" "/root/setup_prover_only_ethProof.sh"
-      run_installer
-      ;;
-    3) close_all_screens; reset_keys; echo "Done." ;;
-    4) delete_key_for_import; close_all_screens ;;
-    5) launch_prover ;;
-    6) exit 0 ;;
-    *) echo "Invalid option." ;;
+  while true; do
+    logo
+    echo "1) Attach to screen session [$SCREEN_NAME]"
+    echo "2) Update script and mode"
+    echo "3) Reset key and kill all Prover sessions"
+    echo "4) Delete key for import"
+    echo "5) Launch new Prover"
+    echo "6) Exit"
+    echo
+    read -p "Choose an option [1-6]: " CHOICE
+    case $CHOICE in
+      1) screen -r "$SCREEN_NAME" ;;
+      2)
+        echo
+        echo -e "\\e[91m"
+        echo "╔═════════════════════════════════════════════════════╗"
+        echo "║                     ⚠ WARNING ⚠                    ║"
+        echo "║                                                     ║"
+        echo "║     Your key will be deleted                        ║"
+        echo "║     and Prover will be reinstalled.                 ║"
+        echo "║                                                     ║"
+        echo "╚═════════════════════════════════════════════════════╝"
+        echo -e "\\e[0m"
+        sleep 2
+        read -p "Continue? (y/n): " CONFIRM
+        [[ "$CONFIRM" != "y" ]] && echo "Cancelled." && continue
+        select_mode
+        save_config
+        close_all_screens
+        reset_keys
+        rm -rf /root/cysic-prover/
+        rm -f "$HOME/$SCRIPT_NAME"
+        rm -f /root/setup_prover*.sh
+        run_installer
+        ;;
+      3)
+        close_all_screens
+        reset_keys
+        echo "Done."
+        ;;
+      4)
+        delete_key_for_import
+        ;;
+      5)
+        launch_prover
+        ;;
+      6)
+        echo "Bye!" && exit 0
+        ;;
+      *)
+        echo "Invalid option."
+        ;;
     esac
     echo
     read -p "Press Enter to return to menu..."
   done
 }
+
 
 ### Main
 logo
