@@ -183,8 +183,8 @@ main_menu() {
         echo "Done."
         ;;
       4)
-        delete_key_for_import
         close_all_screens
+        delete_key_for_import
         ;;
       5)
         launch_prover
