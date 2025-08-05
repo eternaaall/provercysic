@@ -142,6 +142,7 @@ launch_prover() {
 }
 
 main_menu() {
+ while true; do
   logo
   echo "1) Attach to screen session [$SCREEN_NAME]"
   echo "2) Update script and mode"
