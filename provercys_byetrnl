@@ -182,7 +182,10 @@ main_menu() {
     5) launch_prover ;;
     6) exit 0 ;;
     *) echo "Invalid option." ;;
-  esac
+    esac
+    echo
+    read -p "Press Enter to return to menu..."
+  done
 }
 
 ### Main
