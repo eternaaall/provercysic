@@ -184,6 +184,7 @@ main_menu() {
         ;;
       4)
         delete_key_for_import
+        close_all_screens
         ;;
       5)
         launch_prover
