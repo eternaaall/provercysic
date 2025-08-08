@@ -46,7 +46,7 @@ reset_keys() {
     read -p "Are you sure you want to delete the prover key? (y/n): " CONFIRM
     [[ "$CONFIRM" != "y" ]] && echo "Cancelled." && return
   fi
-  echo "Removing prover keys..."
+  echo "Removing Prover keys..."
   rm -rf /root/cysic-prover/data/
   rm -rf /root/cysic-prover/~/
   rm -f "$LOG_FILE"
@@ -59,7 +59,7 @@ delete_key_for_import() {
   rm -rf /root/cysic-prover/~/.cysic/assets/* 2>/dev/null
   sed -i '/^PROVER_ID=/d' "$CONFIG_FILE" 2>/dev/null
   unset PROVER_ID
-  echo "Done. Now import your key (/root/cysic-prover/~/.cysic/assets/) and run option 5) to launch and re-import Prover ID."
+  echo "Done. Now import your key (/root/cysic-prover/~/.cysic/assets/) and run option 5) to launch Prover."
 }
 
 close_all_screens() {
@@ -131,7 +131,7 @@ launch_prover() {
   echo "• High-performance CPU"
   echo "• ❗ Running multiple Provers on the same device is currently not supported."
   echo
-  read -p "Do you want to proceed with launching the prover? (y/n): " CONFIRM
+  read -p "Do you want to proceed with launching the Prover? (y/n): " CONFIRM
   [[ "$CONFIRM" != "y" ]] && exit 0
   echo
   reset_keys
@@ -144,9 +144,9 @@ launch_prover() {
 main_menu() {
   while true; do
     logo
-    echo "1) Attach to screen session [$SCREEN_NAME]"
-    echo "2) Update script and mode"
-    echo "3) Reset key and kill all Prover sessions"
+    echo "1) Attach to Prover screen session [$SCREEN_NAME]"
+    echo "2) Update Script & Mode"
+    echo "3) Reset key / Stop all Provers"
     echo "4) Delete key for import"
     echo "5) Launch new Prover"
     echo "6) Exit"
@@ -224,7 +224,7 @@ else
     echo "Invalid wallet address. Try again."
   done
 
-  read -p "Enter your RPC URL (required for Eth): " RPC
+  read -p "Enter your RPC URL (required for Eth mode): " RPC
 
   select_mode
   save_config
